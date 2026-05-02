@@ -16,7 +16,10 @@ const schema = [
     name: "password",
     label: "Password"
   },
-  { type: "text", name: "city", label: "City" }
+  { type: "text",
+    name: "city",
+    label: "City" 
+  }
 ];
 
 renderForm(schema);
