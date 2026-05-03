@@ -1,4 +1,5 @@
 import { store } from "./store.js";
+import { validateField } from "./validation.js";
 
 export function renderForm(schema) {
   const app = document.getElementById("app");
@@ -17,18 +18,26 @@ export function renderForm(schema) {
     input.type = field.type;
     input.name = field.name;
 
-    // 🔥 MAIN PART
+    const errorText = document.createElement("small");
+    errorText.style.color = "red";
+
     input.addEventListener("input", (e) => {
-      store.set(field.name, e.target.value);
+      const value = e.target.value;
+
+      store.set(field.name, value);
+
+      // 🔥 VALIDATION
+      const error = validateField(field, value);
+      errorText.innerText = error;
     });
 
     wrapper.appendChild(label);
     wrapper.appendChild(input);
+    wrapper.appendChild(errorText);
 
     form.appendChild(wrapper);
   });
 
-  // submit handle
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     console.log("FINAL DATA:", store.data);

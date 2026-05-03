@@ -4,12 +4,15 @@ const schema = [
   {
     type: "text",
     name: "username",
-    label: "Username"
+    label: "Username",
+    required: true,
+    minLength: 3
   },
   {
     type: "email",
     name: "email",
-    label: "Email"
+    label: "Email",
+    required:true
   },
   {
     type: "password",
