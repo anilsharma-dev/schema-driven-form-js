@@ -6,7 +6,7 @@ const schema = [
     name: "username",
     label: "Username",
     required: true,
-    minLength: 3
+    minLength: 5
   },
   {
     type: "email",

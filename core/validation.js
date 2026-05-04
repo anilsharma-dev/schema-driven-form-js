@@ -1,12 +1,29 @@
+export const validators = {
+  required: (value) => {
+    if (!value) return "This field is required";
+    return "";
+  },
+
+  minLength: (value, length) => {
+    if (value.length < length) {
+      return `Minimum ${length} characters required`;
+    }
+    return "";
+  }
+};
+
 export function validateField(field, value) {
   let error = "";
 
-  if (field.required && !value) {
-    error = "This field is required";
-  }
+  for (let rule in field) {
+    if (validators[rule]) {
+      const result = validators[rule](value, field[rule]);
 
-  if (field.minLength && value.length < field.minLength) {
-    error = `Minimum ${field.minLength} characters required`;
+      if (result) {
+        error = result;
+        break;
+      }
+    }
   }
 
   return error;
