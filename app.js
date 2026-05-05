@@ -6,12 +6,19 @@ const schema = [
     name: "username",
     label: "Username",
     required: true,
+    custom: (value) => {
+    if (value === "admin") {
+      return "This username is not allowed";
+    }
+    return "";
+  },
     minLength: 5
   },
   {
     type: "email",
     name: "email",
     label: "Email",
+    email:true,
     required:true
   },
   {
