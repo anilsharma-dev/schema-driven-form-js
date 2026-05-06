@@ -6,29 +6,39 @@ const schema = [
     name: "username",
     label: "Username",
     required: true,
+    minLength: 5,
     custom: (value) => {
-    if (value === "admin") {
-      return "This username is not allowed";
+      if (value === "admin") {
+        return "This username is not allowed";
+      }
+      return "";
     }
-    return "";
-  },
-    minLength: 5
   },
   {
     type: "email",
     name: "email",
     label: "Email",
-    email:true,
-    required:true
+    required: true,
+    email: true
   },
   {
-    type: "password",
-    name: "password",
-    label: "Password"
+    type: "textarea", // 🔥 नया
+    name: "bio",
+    label: "Bio"
   },
-  { type: "text",
-    name: "city",
-    label: "City" 
+  {
+    type: "select", // 🔥 नया
+    name: "role",
+    label: "Role",
+    options: [
+      { label: "User", value: "user" },
+      { label: "Admin", value: "admin" }
+    ]
+  },
+  {
+    type: "checkbox", // 🔥 नया
+    name: "agree",
+    label: "Agree to terms"
   }
 ];
 

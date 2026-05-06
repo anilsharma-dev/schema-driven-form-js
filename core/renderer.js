@@ -1,6 +1,41 @@
 import { store } from "./store.js";
 import { validateField } from "./validation.js";
 
+function createField(field) {
+  let element;
+
+  switch (field.type) {
+    case "textarea":
+      element = document.createElement("textarea");
+      break;
+
+    case "select":
+      element = document.createElement("select");
+
+      field.options.forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.innerText = opt.label;
+        element.appendChild(option);
+      });
+      break;
+
+    case "checkbox":
+      element = document.createElement("input");
+      element.type = "checkbox";
+      break;
+
+    default:
+      element = document.createElement("input");
+      element.type = field.type;
+  }
+
+  element.name = field.name;
+  return element;
+}
+
+
+// Main render function
 export function renderForm(schema) {
   const app = document.getElementById("app");
   app.innerHTML = "";
@@ -14,19 +49,25 @@ export function renderForm(schema) {
     const label = document.createElement("label");
     label.innerText = field.label;
 
-    const input = document.createElement("input");
-    input.type = field.type;
-    input.name = field.name;
+    const input = createField(field);
 
     const errorText = document.createElement("small");
     errorText.style.color = "red";
 
+    // Input handling + validation
     input.addEventListener("input", (e) => {
-      const value = e.target.value;
+      let value;
 
+      if (field.type === "checkbox") {
+        value = e.target.checked;
+      } else {
+        value = e.target.value;
+      }
+
+      // update state
       store.set(field.name, value);
 
-      // 🔥 VALIDATION
+      // validation
       const error = validateField(field, value);
       errorText.innerText = error;
     });
@@ -38,6 +79,7 @@ export function renderForm(schema) {
     form.appendChild(wrapper);
   });
 
+  // Submit handler
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     console.log("FINAL DATA:", store.data);
