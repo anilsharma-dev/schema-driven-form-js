@@ -3,6 +3,7 @@ export const store = {
 
   set(key, value) {
     this.data[key] = value;
+
     console.log("STATE:", this.data);
   },
 
