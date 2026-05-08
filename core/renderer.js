@@ -56,17 +56,39 @@ function createField(field) {
 
 
 
-// CONDITIONAL FIELD CHECK
+// ADVANCED CONDITIONAL ENGINE
 function shouldShowField(field) {
 
+  // no condition
   if (!field.showIf) return true;
 
   const {
-    field: depField,
-    value
+    mode,
+    conditions
   } = field.showIf;
 
-  return store.get(depField) === value;
+
+  // AND logic
+  if (mode === "AND") {
+
+    return conditions.every(cond => {
+
+      return store.get(cond.field) === cond.value;
+    });
+  }
+
+
+  // OR logic
+  if (mode === "OR") {
+
+    return conditions.some(cond => {
+
+      return store.get(cond.field) === cond.value;
+    });
+  }
+
+
+  return true;
 }
 
 
