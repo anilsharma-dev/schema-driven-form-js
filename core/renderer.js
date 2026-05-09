@@ -1,8 +1,6 @@
 import { store } from "./store.js";
 import { validateField } from "./validation.js";
 
-
-
 function createField(field) {
 
   let element;
@@ -106,8 +104,16 @@ export function renderForm(schema) {
   schema.forEach(field => {
 
     // conditional rendering
-    if (!shouldShowField(field)) return;
+    const visible = shouldShowField(field);
 
+
+    // remove hidden field value
+    if (!visible) {
+
+      store.remove(field.name);
+
+      return;
+    }
 
     const wrapper = document.createElement("div");
 
