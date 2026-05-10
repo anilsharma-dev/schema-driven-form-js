@@ -1,6 +1,8 @@
 import { store } from "./store.js";
 import { validateField } from "./validation.js";
 
+
+//  FIELD FACTORY
 function createField(field) {
 
   let element;
@@ -54,10 +56,9 @@ function createField(field) {
 
 
 
-// ADVANCED CONDITIONAL ENGINE
+//  ADVANCED CONDITIONAL ENGINE
 function shouldShowField(field) {
 
-  // no condition
   if (!field.showIf) return true;
 
   const {
@@ -66,7 +67,6 @@ function shouldShowField(field) {
   } = field.showIf;
 
 
-  // AND logic
   if (mode === "AND") {
 
     return conditions.every(cond => {
@@ -76,7 +76,6 @@ function shouldShowField(field) {
   }
 
 
-  // OR logic
   if (mode === "OR") {
 
     return conditions.some(cond => {
@@ -91,7 +90,7 @@ function shouldShowField(field) {
 
 
 
-// MAIN RENDERER
+//  MAIN FORM RENDERER
 export function renderForm(schema) {
 
   const app = document.getElementById("app");
@@ -103,11 +102,10 @@ export function renderForm(schema) {
 
   schema.forEach(field => {
 
-    // conditional rendering
     const visible = shouldShowField(field);
 
 
-    // remove hidden field value
+    //  cleanup hidden field state
     if (!visible) {
 
       store.remove(field.name);
@@ -115,22 +113,23 @@ export function renderForm(schema) {
       return;
     }
 
+
     const wrapper = document.createElement("div");
 
     wrapper.className = "form-group";
 
 
-    // Label
+    //  Label
     const label = document.createElement("label");
 
     label.innerText = field.label;
 
 
-    // Dynamic field
+    //  Dynamic field
     const input = createField(field);
 
 
-    // restore saved value
+    //  restore saved value
     const savedValue = store.get(field.name);
 
     if (savedValue !== undefined) {
@@ -152,7 +151,7 @@ export function renderForm(schema) {
     errorText.style.color = "red";
 
 
-    // EVENT HANDLING
+    //  INPUT HANDLING
     input.addEventListener("input", (e) => {
 
       let value;
@@ -167,18 +166,19 @@ export function renderForm(schema) {
       }
 
 
-      // save state
+      //  update state
       store.set(field.name, value);
 
 
-      // validation
+      //  validation
       const error = validateField(field, value);
 
       errorText.innerText = error;
     });
 
 
-    // ONLY re-render for select + checkbox
+
+    //  conditional re-render
     if (
       field.type === "select" ||
       field.type === "checkbox"
@@ -202,16 +202,7 @@ export function renderForm(schema) {
 
 
 
-  // submit
-  form.addEventListener("submit", (e) => {
-
-    e.preventDefault();
-
-    console.log("FINAL DATA:", store.data);
-  });
-
-
-
+  //  SUBMIT BUTTON
   const button = document.createElement("button");
 
   button.type = "submit";
@@ -220,6 +211,61 @@ export function renderForm(schema) {
 
 
   form.appendChild(button);
+
+
+
+  //  LOADING MESSAGE
+  const statusText = document.createElement("p");
+
+  form.appendChild(statusText);
+
+
+
+  //  API SUBMIT
+  form.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+      statusText.innerText = "Submitting...";
+
+
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify(store.data)
+        }
+      );
+
+
+      if (!response.ok) {
+
+        throw new Error("API request failed");
+      }
+
+
+      const result = await response.json();
+
+      console.log("API RESPONSE:", result);
+
+      statusText.innerText = "Form submitted successfully ✅";
+
+    } catch (error) {
+
+      console.error(error);
+
+      statusText.innerText = "Submission failed ❌";
+    }
+  });
+
+
 
   app.appendChild(form);
 }
