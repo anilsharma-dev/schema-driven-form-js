@@ -2,6 +2,7 @@ import { store } from "./store.js";
 import { validateField } from "./validation.js";
 
 
+
 //  FIELD FACTORY
 function createField(field) {
 
@@ -56,7 +57,7 @@ function createField(field) {
 
 
 
-//  ADVANCED CONDITIONAL ENGINE
+//  CONDITIONAL ENGINE
 function shouldShowField(field) {
 
   if (!field.showIf) return true;
@@ -90,7 +91,33 @@ function shouldShowField(field) {
 
 
 
-//  MAIN FORM RENDERER
+//  FORM VALIDATOR
+function validateForm(schema) {
+
+  let isValid = true;
+
+  schema.forEach(field => {
+
+    const visible = shouldShowField(field);
+
+    if (!visible) return;
+
+    const value = store.get(field.name) || "";
+
+    const error = validateField(field, value);
+
+    if (error) {
+
+      isValid = false;
+    }
+  });
+
+  return isValid;
+}
+
+
+
+//  MAIN RENDERER
 export function renderForm(schema) {
 
   const app = document.getElementById("app");
@@ -105,7 +132,7 @@ export function renderForm(schema) {
     const visible = shouldShowField(field);
 
 
-    //  cleanup hidden field state
+    //  cleanup hidden fields
     if (!visible) {
 
       store.remove(field.name);
@@ -119,13 +146,13 @@ export function renderForm(schema) {
     wrapper.className = "form-group";
 
 
-    //  Label
+    //  label
     const label = document.createElement("label");
 
     label.innerText = field.label;
 
 
-    //  Dynamic field
+    //  input
     const input = createField(field);
 
 
@@ -145,13 +172,13 @@ export function renderForm(schema) {
     }
 
 
-    //  Error text
+    //  error text
     const errorText = document.createElement("small");
 
     errorText.style.color = "red";
 
 
-    //  INPUT HANDLING
+    //  input handling
     input.addEventListener("input", (e) => {
 
       let value;
@@ -166,11 +193,9 @@ export function renderForm(schema) {
       }
 
 
-      //  update state
       store.set(field.name, value);
 
 
-      //  validation
       const error = validateField(field, value);
 
       errorText.innerText = error;
@@ -178,7 +203,7 @@ export function renderForm(schema) {
 
 
 
-    //  conditional re-render
+    //  conditional rerender
     if (
       field.type === "select" ||
       field.type === "checkbox"
@@ -202,31 +227,46 @@ export function renderForm(schema) {
 
 
 
-  //  SUBMIT BUTTON
+  //  submit button
   const button = document.createElement("button");
 
   button.type = "submit";
 
   button.innerText = "Submit";
 
-
   form.appendChild(button);
 
 
 
-  //  LOADING MESSAGE
+  //  status text
   const statusText = document.createElement("p");
 
   form.appendChild(statusText);
 
 
 
-  //  API SUBMIT
+  //  submit handler
   form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+
+    //  validate full form
+    const valid = validateForm(schema);
+
+    if (!valid) {
+
+      statusText.innerText =
+        "Please fix validation errors ";
+
+      return;
+    }
+
+
     try {
+
+      //  disable button
+      button.disabled = true;
 
       statusText.innerText = "Submitting...";
 
@@ -255,13 +295,28 @@ export function renderForm(schema) {
 
       console.log("API RESPONSE:", result);
 
-      statusText.innerText = "Form submitted successfully ✅";
+
+      //  success
+      statusText.innerText =
+        "Form submitted successfully";
+
+
+      //  reset form
+      store.reset();
+
+      renderForm(schema);
 
     } catch (error) {
 
       console.error(error);
 
-      statusText.innerText = "Submission failed ❌";
+      statusText.innerText =
+        "Submission failed ❌";
+
+    } finally {
+
+      // enable button again
+      button.disabled = false;
     }
   });
 
