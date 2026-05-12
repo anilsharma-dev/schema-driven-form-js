@@ -26,6 +26,7 @@ function createField(field) {
         const option = document.createElement("option");
 
         option.value = opt.value;
+
         option.innerText = opt.label;
 
         element.appendChild(option);
@@ -91,7 +92,7 @@ function shouldShowField(field) {
 
 
 
-//  FORM VALIDATOR
+//  FULL FORM VALIDATION
 function validateForm(schema) {
 
   let isValid = true;
@@ -127,12 +128,13 @@ export function renderForm(schema) {
   const form = document.createElement("form");
 
 
+
   schema.forEach(field => {
 
     const visible = shouldShowField(field);
 
 
-    //  cleanup hidden fields
+    //  remove hidden field data
     if (!visible) {
 
       store.remove(field.name);
@@ -156,7 +158,7 @@ export function renderForm(schema) {
     const input = createField(field);
 
 
-    //  restore saved value
+    //  RESTORE SAVED VALUE
     const savedValue = store.get(field.name);
 
     if (savedValue !== undefined) {
@@ -172,14 +174,15 @@ export function renderForm(schema) {
     }
 
 
-    //  error text
+    //  error
     const errorText = document.createElement("small");
 
     errorText.style.color = "red";
 
 
-    //  input handling
-    input.addEventListener("input", (e) => {
+
+    //  COMMON CHANGE HANDLER
+    const handleChange = (e) => {
 
       let value;
 
@@ -193,27 +196,41 @@ export function renderForm(schema) {
       }
 
 
+      //  save state
       store.set(field.name, value);
 
 
+      //  validate
       const error = validateField(field, value);
 
       errorText.innerText = error;
-    });
+
+
+      //  rerender conditional fields
+      if (
+        field.type === "select" ||
+        field.type === "checkbox"
+      ) {
+
+        renderForm(schema);
+      }
+    };
 
 
 
-    //  conditional rerender
+    //  Correct event binding
     if (
       field.type === "select" ||
       field.type === "checkbox"
     ) {
 
-      input.addEventListener("change", () => {
+      input.addEventListener("change", handleChange);
 
-        renderForm(schema);
-      });
+    } else {
+
+      input.addEventListener("input", handleChange);
     }
+
 
 
     wrapper.appendChild(label);
@@ -224,6 +241,7 @@ export function renderForm(schema) {
 
     form.appendChild(wrapper);
   });
+
 
 
 
@@ -238,10 +256,12 @@ export function renderForm(schema) {
 
 
 
+
   //  status text
   const statusText = document.createElement("p");
 
   form.appendChild(statusText);
+
 
 
 
@@ -251,13 +271,12 @@ export function renderForm(schema) {
     e.preventDefault();
 
 
-    //  validate full form
     const valid = validateForm(schema);
 
     if (!valid) {
 
       statusText.innerText =
-        "Please fix validation errors ";
+        "Please fix validation errors";
 
       return;
     }
@@ -265,7 +284,6 @@ export function renderForm(schema) {
 
     try {
 
-      //  disable button
       button.disabled = true;
 
       statusText.innerText = "Submitting...";
@@ -296,14 +314,15 @@ export function renderForm(schema) {
       console.log("API RESPONSE:", result);
 
 
-      //  success
       statusText.innerText =
-        "Form submitted successfully";
+        "Form submitted successfully ";
 
 
-      //  reset form
+      //  reset store
       store.reset();
 
+
+      //  rerender clean form
       renderForm(schema);
 
     } catch (error) {
@@ -311,11 +330,10 @@ export function renderForm(schema) {
       console.error(error);
 
       statusText.innerText =
-        "Submission failed ❌";
+        "Submission failed";
 
     } finally {
 
-      // enable button again
       button.disabled = false;
     }
   });
