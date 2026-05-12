@@ -1,6 +1,12 @@
+const STORAGE_KEY = "dynamic-form-engine";
+
 export const store = {
 
-  data: {},
+  //  load initial data from localStorage
+  data: JSON.parse(
+    localStorage.getItem(STORAGE_KEY)
+  ) || {},
+
 
 
   //  set value
@@ -8,8 +14,15 @@ export const store = {
 
     this.data[key] = value;
 
+    //  persist to localStorage
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(this.data)
+    );
+
     console.log("STATE:", this.data);
   },
+
 
 
   //  get value
@@ -19,19 +32,30 @@ export const store = {
   },
 
 
+
   //  remove hidden field
   remove(key) {
 
     delete this.data[key];
 
+    //  update storage
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(this.data)
+    );
+
     console.log("REMOVED:", key);
   },
 
 
-  // reset full form state
+
+  //  reset form
   reset() {
 
     this.data = {};
+
+    //  clear storage
+    localStorage.removeItem(STORAGE_KEY);
 
     console.log("STORE RESET");
   }
