@@ -1,27 +1,216 @@
-body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+* {
+  box-sizing: border-box;
 }
 
+
+body {
+
+  margin: 0;
+
+  padding: 40px;
+
+  font-family: Arial, sans-serif;
+
+  background: #f4f7fb;
+}
+
+
+
+/*  Main Card */
+#app {
+
+  max-width: 600px;
+
+  margin: auto;
+
+  background: white;
+
+  padding: 30px;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.08);
+}
+
+
+
+/*  Heading */
 h2 {
+
+  text-align: center;
+
+  margin-bottom: 30px;
+
+  color: #222;
+}
+
+
+
+/*  Form Group */
+.form-group {
+
+  display: flex;
+
+  flex-direction: column;
+
   margin-bottom: 20px;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
 
+
+/*  Labels */
 label {
-  display: block;
-  margin-bottom: 5px;
+
+  margin-bottom: 8px;
+
+  font-weight: 600;
+
+  color: #333;
 }
 
-input {
-  padding: 8px;
-  width: 250px;
+
+
+/*  Inputs */
+input,
+textarea,
+select {
+
+  width: 100%;
+
+  padding: 12px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  transition: border 0.2s;
 }
 
+
+
+/*  Focus State */
+input:focus,
+textarea:focus,
+select:focus {
+
+  outline: none;
+
+  border-color: #4a90e2;
+}
+
+
+
+/*  Textarea */
+textarea {
+
+  min-height: 100px;
+
+  resize: vertical;
+}
+
+
+
+/*  Checkbox */
+input[type="checkbox"] {
+
+  width: auto;
+
+  margin-right: 10px;
+}
+
+
+
+/*  Error Text */
+small {
+
+  color: red;
+
+  margin-top: 5px;
+}
+
+
+
+/*  Button */
 button {
-  padding: 8px 16px;
+
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #4a90e2;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
   cursor: pointer;
+
+  transition: background 0.2s;
+}
+
+
+
+/*  Hover */
+button:hover {
+
+  background: #357bd8;
+}
+
+
+
+/*  Disabled */
+button:disabled {
+
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+
+
+/*  Responsive */
+@media (max-width: 768px) {
+
+  body {
+
+    padding: 20px;
+  }
+
+
+  #app {
+
+    padding: 20px;
+  }
+  
+}
+/* Checkbox Layout */
+.form-group:has(input[type="checkbox"]) {
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+
+/* Remove extra margin */
+.form-group input[type="checkbox"] {
+
+  margin: 0;
+}
+/* Remove top margin only for checkbox label */
+.form-group:has(input[type="checkbox"]) label {
+
+  margin-bottom: 0;
 }
